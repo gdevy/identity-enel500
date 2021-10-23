@@ -1,5 +1,15 @@
 # identity-enel500
 
+## Portal
+
+### CLI
+
+Run the application using (use `--help` option to see available commands)
+
+```shell
+python src/portal/cli
+```
+
 ## Setup (Passport)
 
 TODO
@@ -34,5 +44,9 @@ deactivate
 ```
 
 #### Dependencies
+
+> click (=8.0.3)
+
+Used to create a CLI interface for the project. [docs](https://click.palletsprojects.com/en/8.0.x/)
 
 TODO
