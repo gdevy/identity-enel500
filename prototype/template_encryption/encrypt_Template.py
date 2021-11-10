@@ -8,7 +8,7 @@ f = open("Output.txt", "w")
 
 with open("crypto_Template.txt") as file:
     for line in file:
-        decryptString = crypter.decrypt(str.encode(line.rstrip()[2:-1]))
+        decryptString = crypter.decrypt(str.encode(line.rstrip()))
 #        print(str(decryptString, 'utf8'))
         f.write(str(decryptString, 'utf8'))
         f.write("\n")

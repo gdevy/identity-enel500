@@ -13,7 +13,7 @@ f = open("crypto_Template.txt", "w")
 with open("Template.txt") as file:
     for line in file:
          x=crypter.encrypt(str.encode(line.rstrip()))
-         f.write(str(x))
+         f.write(str(x)[2:-1])
          f.write("\n")
 file.close()
 f.close()
