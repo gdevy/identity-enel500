@@ -114,15 +114,15 @@ void NFC_Reading() {
 
 ////////////////////////////////////////////////////////////////////////////////
 void BLE_Setup() {
-    // power off
+    digitalWrite(PW_PIN,LOW);// power off
     // press button
-    // enable pin high
-    // power on
+    digitalWrite(EN_PIN,HIGH);// enable pin high
+    digitalWrite(PW_PIN,HIGH);// power on
     // release button
 
     configBt.begin(38400);
 
-    delay(100);
+    delay(200);//Wait for Bluetooth to turn on
 
     do {
         if (configBt.available()) { //if the bluetooth module is sending something...
@@ -154,11 +154,11 @@ void BLE_Setup() {
 
     } while (stage_two != 3);
 
-    delay(100);
+    //delay(100);
 
-    // power off
-    // enable pin low
-    // power on
+    digitalWrite(PW_PIN,LOW);// power off
+    digitalWrite(EN_PIN,LOW);// enable pin low
+    digitalWrite(PW_PIN,HIGH);// power on
 }
 
 //Recieve template file
