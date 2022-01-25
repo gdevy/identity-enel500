@@ -1,0 +1,22 @@
+Scanner
+
+    turn on BT command mode
+        power low
+        command pin high
+        power high
+
+        check BT module status
+            wait ok
+
+        indicate startup ok
+
+    wait nfc tag
+        save BT address
+
+    try to connect to passport
+        ...
+
+    request template from passport over BT
+        wait for template
+
+    communicate over serial with python app
