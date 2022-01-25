@@ -4,7 +4,7 @@
 
 #define SS_PIN 10  //slave select pin
 #define RST_PIN 5  //reset pin
-#define EN_PIN 9  //Bluetooth enable pin
+#define EN_PIN 4  //Bluetooth enable pin
 #define PW_PIN 8   //Bluetooth power pin
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);  // instatiate a MFRC522 reader object.
@@ -33,10 +33,12 @@ void setup()
     mfrc522.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
     pinMode(2, OUTPUT);
     pinMode(3, INPUT);
-    pinMode(9, OUTPUT);
+    //pinMode(9, OUTPUT);
     pinMode(8,OUTPUT);
-    analogWrite(9,168);
+    pinMode(4,OUTPUT);
+    //analogWrite(9,168);
     digitalWrite(8,HIGH);
+    digitalWrite(4,HIGH);
     
     // Prepare the security key for the read and write functions.
     for (byte i = 0; i < 6; i++) 
@@ -49,7 +51,8 @@ void setup()
 
 void loop() {
     digitalWrite(8,HIGH);
-    analogWrite(9,168);
+    digitalWrite(4,HIGH);
+    //analogWrite(9,168);
     if(stage_one == 0)
     {
       NFC_Reading();
@@ -65,7 +68,8 @@ void loop() {
     
     if(stage_two == 3)
     {
-      analogWrite(9,0);
+      //analogWrite(9,0);
+      digitalWrite(4,LOW);
       Serial.print("BLE is updated.");
       delay(100);
       File_update();
