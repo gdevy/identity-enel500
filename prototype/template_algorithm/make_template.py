@@ -1,23 +1,43 @@
 from pathlib import Path
+import numpy as np
 
 from cv2 import cv2
-import face_recognition
+from deepface import DeepFace
 
-p = Path("/Users/gregdevyatov/School/ENGG500/lfw/Aaron_Eckhart/Aaron_Eckhart_0001.jpg")
+model_selection = "OpenFace"
 
-# load the input image and convert it from BGR (OpenCV ordering)
-# to dlib ordering (RGB)
-image = cv2.imread(str(p))
-rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+p = Path("/Users/gregdevyatov/School/ENGG500/lfw/")
 
-boxes = face_recognition.face_locations(rgb, model='cnn')
-# compute the facial embedding for the face
+counts = dict()
+for i, folder in enumerate(p.iterdir()):
+    if folder.is_dir():
+        counts[folder.name] = len(list(folder.iterdir()))
 
-encodings = face_recognition.face_encodings(rgb, boxes)
-# loop over the encodings
+in_class_name = "Andy_Roddick"
+in_class_embeddings = []
+for image_p in (p / in_class_name).iterdir():
+    image = cv2.imread(str(image_p))
+    try:
+        embedding = DeepFace.represent(image, model_name=model_selection)
+    except ValueError as err:
+        print(f"coulnd't find face in {image_p}")
+        continue
+    in_class_embeddings.append(np.array(embedding))
 
-for encoding in encodings:
-    # add each encoding + name to our set of known names and
-    # encodings
-    knownEncodings.append(encoding)
-    knownNames.append(name)
+embeddings = np.array(in_class_embeddings)
+inclass_mean = np.mean(embeddings, 0)
+
+for person in list(p.iterdir())[:30]:
+    dists = []
+    for image_p in person.iterdir():
+        image = cv2.imread(str(image_p))
+        try:
+            embedding = np.array(DeepFace.represent(image, model_name=model_selection))
+        except ValueError as err:
+            print(f"coulnd't find face in {image_p}")
+            continue
+
+        d = np.linalg.norm(embedding - inclass_mean)
+        dists.append(d)
+
+    print(dists)
