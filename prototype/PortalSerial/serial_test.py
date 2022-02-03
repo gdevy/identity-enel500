@@ -18,6 +18,7 @@ if __name__ == '__main__':
 
         with serial.Serial("COM5", 9600) as port:
             bytes_in = port.read(num_bytes)
+            port.write(f"{len(bytes_in)}\n")
 
         print(f"read {len(bytes_in)} bytes")
         print(bytes_in)
