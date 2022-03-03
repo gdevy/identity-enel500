@@ -1,4 +1,6 @@
 from pathlib import Path
+from typing import List
+
 import numpy as np
 
 from cv2 import cv2
@@ -41,3 +43,4 @@ for person in list(p.iterdir())[:30]:
         dists.append(d)
 
     print(dists)
+

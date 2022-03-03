@@ -4,6 +4,7 @@ import click
 import cv2.cv2
 
 from src.portal.biometrics.camera import create_probe
+from src.portal.biometrics.template import pipeline
 
 
 @click.group()
@@ -39,8 +40,16 @@ def take_image(output):
     create_probe(Path(output))
 
 
+@click.command()
+@click.option('--input_image', help='path to output file')
+def create_template(input_image):
+    """Test image acquisition, writes to output file"""
+    print(pipeline(Path(input_image)))
+
+
 if __name__ == '__main__':
     cli.add_command(hello2)
     cli.add_command(hello)
     cli.add_command(take_image)
+    cli.add_command(create_template)
     cli()
