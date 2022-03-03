@@ -29,8 +29,8 @@ def pipeline(image_path: Path) -> np.array:
     return template
 
 
-def compare(template_path: Path, probe_path: Path, threshold=1.0) -> Tuple[float, bool]:
-    template = pipeline(template_path)
+def compare(template: np.array, probe_path: Path, threshold=1.0) -> Tuple[float, bool]:
+
     probe = pipeline(probe_path)
     dist = np.linalg.norm(template - probe)
 
