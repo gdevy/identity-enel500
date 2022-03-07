@@ -1,3 +1,7 @@
+"""
+Functions handling creation of template
+"""
+
 from pathlib import Path
 from typing import List, Tuple
 

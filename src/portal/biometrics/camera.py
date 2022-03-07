@@ -1,5 +1,5 @@
 """
-This is a temporary script file.
+Interfaces with the camera to create template
 """
 import copy
 from pathlib import Path
@@ -66,23 +66,3 @@ def capture_photo(cam, retry_msg=None):
 
         elif k == 13:
             return img
-
-
-def preprocessPhoto():
-    pass
-
-
-def convertToTemplate():
-    pass
-
-
-def storeTemplate():
-    pass
-
-
-def aquireStoredTemplate():
-    pass
-
-
-def distanceCalculation():
-    pass
