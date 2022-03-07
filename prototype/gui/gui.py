@@ -3,6 +3,8 @@ import time
 import cv2
 import copy
 import random
+import pathlib
+
 
 count = 0
 identitySubmitted = False
@@ -49,7 +51,7 @@ def saveData(image,name,birthdate):
     else:
         return [name,birthdate]
 
-def home():
+def home(imagePath):
     frmMain = Frame(gui,bg="white")
     #Configure the row/col of our frame and root window to be resizable and fill all available space
     frmMain.grid(row=0, column=0, sticky="NESW")
@@ -60,21 +62,21 @@ def home():
     w.place(anchor = CENTER, relx = .5, rely = .2)
 
     # Add Image
-    enrollButtonImage = PhotoImage(file = "prototype\gui\Images\enrollButton.png")
-    verifyButtonImage = PhotoImage(file = "prototype\gui\Images\\verifyButton.png")
+    enrollButtonImage = PhotoImage(file = str(imagePath/"enrollButton.png"))
+    verifyButtonImage = PhotoImage(file = str(imagePath/"verifyButton.png"))
 
     enrollButton = Button(frmMain, image = enrollButtonImage, bg='white',
-                    command=lambda: enroll(), height=60, width=305, borderwidth=0 )
+                    command=lambda: enroll(imagePath), height=60, width=305, borderwidth=0 )
     enrollButton.image = enrollButtonImage
     enrollButton.place(anchor = CENTER, relx = .5, rely = .45)
  
     verifyButton =  Button(frmMain, image = verifyButtonImage, bg='white',
-                    command=lambda: verify(), height=60, width=305, borderwidth=0 )
+                    command=lambda: verify(imagePath), height=60, width=305, borderwidth=0 )
     verifyButton.image = verifyButtonImage
     verifyButton.place(anchor = CENTER, relx = .5, rely = .6)
 
 
-def verify():
+def verify(imagePath):
     global count
     count = 0
     frmVerify = Frame(gui,bg="white")
@@ -84,10 +86,10 @@ def verify():
     frmVerify.grid_columnconfigure(0, weight=1)
 
    # Add Image
-    homeButtonImage = PhotoImage(file = "prototype\gui\Images\homeButton.png")
+    homeButtonImage = PhotoImage(file = str(imagePath/"homeButton.png"))
     
     homeButton = Button(frmVerify, image = homeButtonImage, bg='white',
-                    command=lambda: home(), height=32, width=125, borderwidth=0 )
+                    command=lambda: home(imagePath), height=32, width=125, borderwidth=0 )
     homeButton.image = homeButtonImage
     homeButton.place(anchor = CENTER, relx = .075, rely = .055)
 
@@ -105,9 +107,9 @@ def verify():
 
     waitForPassportData()
 
-    startOverImage = PhotoImage(file = "prototype\gui\Images\startOverButton1.png")
+    startOverImage = PhotoImage(file = str(imagePath/"startOverButton.png"))
     startOverButton = Button(frmVerify, image = startOverImage, bg='white',
-                    command=lambda: verify(), height=45, width=65, borderwidth=0 )
+                    command=lambda: verify(imagePath), height=45, width=65, borderwidth=0 )
     startOverButton.image = startOverImage
     startOverButton.place(anchor = CENTER, relx = .95, rely = .05)
     w = Label(frmVerify, background='white',justify='center',font= ('Helvetica 15 bold'),  text='Look at the camera and make sure your whole face is in the frame.')
@@ -194,7 +196,7 @@ def show_frame_background(cap, cameraCanvas):
     return img
 
 
-def enroll():
+def enroll(imagePath):
     global count
     count = 0
     global identitySubmitted
@@ -206,10 +208,10 @@ def enroll():
     frmEnroll.grid_columnconfigure(0, weight=1)
 
    # Add Image
-    homeButtonImage = PhotoImage(file = "prototype\gui\Images\homeButton.png")
+    homeButtonImage = PhotoImage(file = str(imagePath/"homeButton.png"))
     
     homeButton = Button(frmEnroll, image = homeButtonImage, bg='white',
-                    command=lambda: home(), height=32, width=125, borderwidth=0 )
+                    command=lambda: home(imagePath), height=32, width=125, borderwidth=0 )
     homeButton.image = homeButtonImage
     homeButton.place(anchor = CENTER, relx = .075, rely = .055)
 
@@ -227,9 +229,9 @@ def enroll():
 
     waitForPassportConnection()
 
-    startOverImage = PhotoImage(file = "prototype\gui\Images\startOverButton1.png")
+    startOverImage = PhotoImage(file = str(imagePath/"startOverButton.png"))
     startOverButton = Button(frmEnroll, image = startOverImage, bg='white',
-                    command=lambda: enroll(), height=45, width=65, borderwidth=0 )
+                    command=lambda: enroll(imagePath), height=45, width=65, borderwidth=0 )
     startOverButton.image = startOverImage
     startOverButton.place(anchor = CENTER, relx = .95, rely = .05)
     w = Label(frmEnroll, background='white',justify='center',font= ('Helvetica 15 bold'),  text='Complete identity information below.')
@@ -261,7 +263,7 @@ def enroll():
     date_field.place(anchor = CENTER, relx = .52, rely = .55)
 
     # Add Image
-    submitButtonImage = PhotoImage(file = "prototype\gui\Images\submitButton.png")
+    submitButtonImage = PhotoImage(file = str(imagePath/"submitButton.png"))
     
     submitButton = Button(frmEnroll, image = submitButtonImage, bg='light grey',background='light grey', activebackground='light grey',
                     command=lambda: submitIdentity(), height=32, width=95, borderwidth=0 )
@@ -343,6 +345,9 @@ def input():
 # Driver code
 if __name__ == "__main__":
 
+    cwd = pathlib.Path.cwd()
+    imagePath = cwd/ "prototype"/"gui"/"Images"
+    
     # create a GUI window
     gui = Tk()
  
@@ -358,8 +363,5 @@ if __name__ == "__main__":
     gui.grid_rowconfigure(0, weight=1)
     gui.grid_columnconfigure(0, weight=1)
      # start the GUI
-    home()
+    home(imagePath)
     gui.mainloop()
-
-
-
