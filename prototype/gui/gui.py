@@ -3,7 +3,7 @@ from pathlib import Path
 import copy
 import random
 
-import cv2
+from cv2 import cv2
 
 import tkinter
 from tkinter import Frame, Button, Label, PhotoImage, Tk, Canvas, Entry, StringVar
@@ -41,13 +41,13 @@ def findFace(image):
     if count == 20:
         return True
     else:
-        False
+        return False
 
 
 def compareBiometrics():
     # TODO
     result = random.randint(0, 3)
-    if (result <= 1):
+    if result <= 1:
         return None
     else:
         return ['Mary James', '29 December, 1984']
@@ -56,20 +56,20 @@ def compareBiometrics():
 def saveData(image, name, birthdate):
     # TODO
     result = random.randint(0, 3)
-    if (result <= 1):
+    if result <= 1:
         return None
     else:
         return [name, birthdate]
 
 
-def home(imagePath):
+def home():
     frmMain = Frame(gui, bg="white")
     # Configure the row/col of our frame and root window to be resizable and fill all available space
     frmMain.grid(row=0, column=0, sticky="NESW")
     frmMain.grid_rowconfigure(0, weight=1)
     frmMain.grid_columnconfigure(0, weight=1)
 
-    w = Label(frmMain, background='white', justify='center', font=('Helvetica 24 bold'),
+    w = Label(frmMain, background='white', justify='center', font='Helvetica 24 bold',
               text='Identity Verification System')
     w.place(anchor=tkinter.CENTER, relx=.5, rely=.2)
 
@@ -78,17 +78,17 @@ def home(imagePath):
     verifyButtonImage = PhotoImage(file=str(imagePath / "verifyButton.png"))
 
     enrollButton = Button(frmMain, image=enrollButtonImage, bg='white',
-                          command=lambda: enroll(imagePath), height=60, width=305, borderwidth=0)
+                          command=lambda: enroll(), height=60, width=305, borderwidth=0)
     enrollButton.image = enrollButtonImage
     enrollButton.place(anchor=tkinter.CENTER, relx=.5, rely=.45)
 
     verifyButton = Button(frmMain, image=verifyButtonImage, bg='white',
-                          command=lambda: verify(imagePath), height=60, width=305, borderwidth=0)
+                          command=lambda: verify(), height=60, width=305, borderwidth=0)
     verifyButton.image = verifyButtonImage
     verifyButton.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
 
 
-def verify(imagePath):
+def verify():
     global count
     count = 0
     frmVerify = Frame(gui, bg="white")
@@ -101,11 +101,11 @@ def verify(imagePath):
     homeButtonImage = PhotoImage(file=str(imagePath / "homeButton.png"))
 
     homeButton = Button(frmVerify, image=homeButtonImage, bg='white',
-                        command=lambda: home(imagePath), height=32, width=125, borderwidth=0)
+                        command=lambda: home(), height=32, width=125, borderwidth=0)
     homeButton.image = homeButtonImage
     homeButton.place(anchor=tkinter.CENTER, relx=.075, rely=.055)
 
-    w = Label(frmVerify, background='white', justify='center', font=('Helvetica 15 bold'),
+    w = Label(frmVerify, background='white', justify='center', font='Helvetica 15 bold',
               text='Tap wearable to scanner device.')
     w.place(anchor=tkinter.CENTER, relx=.5, rely=.06)
 
@@ -121,10 +121,10 @@ def verify(imagePath):
 
     startOverImage = PhotoImage(file=str(imagePath / "startOverButton.png"))
     startOverButton = Button(frmVerify, image=startOverImage, bg='white',
-                             command=lambda: verify(imagePath), height=45, width=65, borderwidth=0)
+                             command=lambda: verify(), height=45, width=65, borderwidth=0)
     startOverButton.image = startOverImage
     startOverButton.place(anchor=tkinter.CENTER, relx=.95, rely=.05)
-    w = Label(frmVerify, background='white', justify='center', font=('Helvetica 15 bold'),
+    w = Label(frmVerify, background='white', justify='center', font='Helvetica 15 bold',
               text='Look at the camera and make sure your whole face is in the frame.')
     w.place(anchor=tkinter.CENTER, relx=.5, rely=.06)
 
@@ -149,15 +149,15 @@ def verify(imagePath):
 
     radius = 125
 
-    if (result != None):
+    if result is not None:
         cameraCanvas.create_oval(450 - radius, 275 - radius, 450 + radius, 275 + radius, fill='green', outline='green')
         cameraCanvas.create_line(450 - 55, 275 + 45, 450 - 85, 275 + 20, capstyle=tkinter.ROUND, fill='white', width=8)
         cameraCanvas.create_line(450 - 55, 275 + 45, 450 + 70, 275 - 65, capstyle=tkinter.ROUND, fill='white', width=8)
-        w = Label(frmVerify, background='green', justify='center', font=('Helvetica 20 bold'), text='Verified',
+        w = Label(frmVerify, background='green', justify='center', font='Helvetica 20 bold', text='Verified',
                   fg='white')
         w.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
         cameraCanvas.create_rectangle(200, 425, 700, 525, fill="light grey", outline="light grey")
-        identity = Label(frmVerify, background='light grey', justify='center', font=('Helvetica 20 bold'),
+        identity = Label(frmVerify, background='light grey', justify='center', font='Helvetica 20 bold',
                          text='Name: ' + result[0] + '\nDate of Birth: ' + result[1])
         identity.place(anchor=tkinter.CENTER, relx=.5, rely=.775)
 
@@ -166,7 +166,7 @@ def verify(imagePath):
                                  outline='dark red')
         cameraCanvas.create_line(450 - 65, 275 - 70, 450 + 70, 275 + 45, capstyle=tkinter.ROUND, fill='white', width=8)
         cameraCanvas.create_line(450 - 65, 275 + 45, 450 + 70, 275 - 70, capstyle=tkinter.ROUND, fill='white', width=8)
-        w = Label(frmVerify, background='dark red', justify='center', font=('Helvetica 20 bold'), text='Failed',
+        w = Label(frmVerify, background='dark red', justify='center', font='Helvetica 20 bold', text='Failed',
                   fg='white')
         w.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
 
@@ -214,7 +214,7 @@ def show_frame_background(cap, cameraCanvas):
     return img
 
 
-def enroll(imagePath):
+def enroll():
     global count
     count = 0
     global identitySubmitted
@@ -229,11 +229,11 @@ def enroll(imagePath):
     homeButtonImage = PhotoImage(file=str(imagePath / "homeButton.png"))
 
     homeButton = Button(frmEnroll, image=homeButtonImage, bg='white',
-                        command=lambda: home(imagePath), height=32, width=125, borderwidth=0)
+                        command=lambda: home(), height=32, width=125, borderwidth=0)
     homeButton.image = homeButtonImage
     homeButton.place(anchor=tkinter.CENTER, relx=.075, rely=.055)
 
-    w = Label(frmEnroll, background='white', justify='center', font=('Helvetica 15 bold'),
+    w = Label(frmEnroll, background='white', justify='center', font='Helvetica 15 bold',
               text='Connect wearable with USB.')
     w.place(anchor=tkinter.CENTER, relx=.5, rely=.06)
 
@@ -249,10 +249,10 @@ def enroll(imagePath):
 
     startOverImage = PhotoImage(file=str(imagePath / "startOverButton.png"))
     startOverButton = Button(frmEnroll, image=startOverImage, bg='white',
-                             command=lambda: enroll(imagePath), height=45, width=65, borderwidth=0)
+                             command=lambda: enroll(), height=45, width=65, borderwidth=0)
     startOverButton.image = startOverImage
     startOverButton.place(anchor=tkinter.CENTER, relx=.95, rely=.05)
-    w = Label(frmEnroll, background='white', justify='center', font=('Helvetica 15 bold'),
+    w = Label(frmEnroll, background='white', justify='center', font='Helvetica 15 bold',
               text='Complete identity information below.')
     w.place(anchor=tkinter.CENTER, relx=.5, rely=.06)
 
@@ -303,7 +303,7 @@ def enroll(imagePath):
     labelDir.destroy()
     labelDirName.destroy()
 
-    w = Label(frmEnroll, background='white', justify='center', font=('Helvetica 15 bold'),
+    w = Label(frmEnroll, background='white', justify='center', font='Helvetica 15 bold',
               text='Look at the camera and make sure your whole face is in the frame.')
     w.place(anchor=tkinter.CENTER, relx=.5, rely=.06)
 
@@ -322,15 +322,15 @@ def enroll(imagePath):
 
     radius = 125
 
-    if (result != None):
+    if result is not None:
         cameraCanvas.create_oval(450 - radius, 275 - radius, 450 + radius, 275 + radius, fill='green', outline='green')
         cameraCanvas.create_line(450 - 55, 275 + 45, 450 - 85, 275 + 20, capstyle=tkinter.ROUND, fill='white', width=8)
         cameraCanvas.create_line(450 - 55, 275 + 45, 450 + 70, 275 - 65, capstyle=tkinter.ROUND, fill='white', width=8)
-        w = Label(frmEnroll, background='green', justify='center', font=('Helvetica 20 bold'), text='Success',
+        w = Label(frmEnroll, background='green', justify='center', font='Helvetica 20 bold', text='Success',
                   fg='white')
         w.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
         cameraCanvas.create_rectangle(200, 425, 700, 525, fill="light grey", outline="light grey")
-        identity = Label(frmEnroll, background='light grey', justify='center', font=('Helvetica 20 bold'),
+        identity = Label(frmEnroll, background='light grey', justify='center', font='Helvetica 20 bold',
                          text='Name: ' + result[0] + '\nDate of Birth: ' + result[1])
         identity.place(anchor=tkinter.CENTER, relx=.5, rely=.775)
 
@@ -339,7 +339,7 @@ def enroll(imagePath):
                                  outline='dark red')
         cameraCanvas.create_line(450 - 65, 275 - 70, 450 + 70, 275 + 45, capstyle=tkinter.ROUND, fill='white', width=8)
         cameraCanvas.create_line(450 - 65, 275 + 45, 450 + 70, 275 - 70, capstyle=tkinter.ROUND, fill='white', width=8)
-        w = Label(frmEnroll, background='dark red', justify='center', font=('Helvetica 20 bold'), text='Failed',
+        w = Label(frmEnroll, background='dark red', justify='center', font='Helvetica 20 bold', text='Failed',
                   fg='white')
         w.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
 
@@ -364,7 +364,6 @@ def input():
 
 # Driver code
 if __name__ == "__main__":
-
     # create a GUI window
     gui = Tk()
 
@@ -373,12 +372,12 @@ if __name__ == "__main__":
 
     # set the title of GUI window and remove tkinter icon
     gui.title("Identity Verification System")
-    # gui.wm_attributes('-toolwindow', 'True')
+    gui.wm_attributes('-toolwindow', 'True')
 
     # set the configuration of GUI window
     gui.geometry("1000x700")
     gui.grid_rowconfigure(0, weight=1)
     gui.grid_columnconfigure(0, weight=1)
     # start the GUI
-    home(imagePath)
+    home()
     gui.mainloop()
