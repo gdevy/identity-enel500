@@ -28,8 +28,8 @@
 #define SD_PIN 10
 
 
-File template;
-char* TEMPLATEFILE = "TEMPLATE.txt"
+File Template;
+char* TEMPLATEFILE = "TEMPLATE.txt";
 
 NeoSWSerial configBt(BT_RX, BT_TX); // RX, TX
 
@@ -43,19 +43,19 @@ void setup() {
 
   if (!SD.begin(SD_PIN)) { // Initialize SD card
     debugMessage("Could not initialize SD card."); // if return value is false, something went wrong.
-    return 1
+    return 1;
   }
 
   if (!SD.exists("TEMPLATE.txt")) { // Check whether "TEMPLATE.txt" exists
     debugMessage("Template file not found exists.");
-    return 1
+    return 1;
   }
 
-  template = SD.open("TEMPLATE.txt", FILE_READ); // open template file to read data
+  Template = SD.open("TEMPLATE.txt", FILE_READ); // open template file to read data
 
-  if (!template) {
+  if (!Template) {
     debugMessage("Couldn't open template file");
-    return 1
+    return 1;
   }
 
 }
@@ -65,12 +65,12 @@ void loop() {
     debugMessage("- – Reading start – -");
 
     char character;
-    while ((character = TEMPLATE.read()) != -1) { // this while loop reads data stored in "TEMPLATE.txt" and prints it to serial monitor
+    while ((character = Template.read()) != -1) { // this while loop reads data stored in "TEMPLATE.txt" and prints it to serial monitor
         configBt.print(character);
     }
 
     configBt.print('@');
-    template.seek(0);
+    Template.seek(0);
     debugMessage("- – Reading end – -");
 
   delay(500); // wait for 500ms

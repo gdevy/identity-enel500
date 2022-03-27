@@ -119,16 +119,16 @@ void loop() {
 //Scan NFC tag
 void NFC_Reading() {
 
-   debugMessage("Scan a MIFARE Classic card");
+  debugMessage("Scan a MIFARE Classic card");
 
-  while(1){
+  while (1) {
     //   Look for new cards
     if (mfrc522.PICC_IsNewCardPresent()) {
       break;
     }
   }
 
-   // Select one of the cards
+  // Select one of the cards
   if (!mfrc522.PICC_ReadCardSerial()) {
     return;
   }
@@ -315,40 +315,38 @@ void receiveTemplate() {
 
   bool at_start = false;
 
-  byte template_buffer[128];
+  //  byte template_buffer[128];
   int template_idx = 0;
+  String fname, lname, dob, template_buffer;
   while (1) {
     if (configBt.available()) {
       byte character = configBt.read();
       if (character == '@') {
-        at_start = true;
-        continue;
-      }
-      if (at_start) {
-        String fname = configBt.readStringUntil('\n');
-        String lname = configBt.readStringUntil('\n');
-        String dob = configBt.readStringUntil('\n');
-        String template_buffer = configBt.readStringUntil('@');
-
         break;
       }
     }
   }
 
-  String info_message = String((char*)template_buffer);
+  fname = configBt.readStringUntil('\n');
+  lname = configBt.readStringUntil('\n');
+  dob = configBt.readStringUntil('\n');
+  template_buffer = configBt.readStringUntil('@');
+  String info_message = template_buffer;
+
   String temp  = "info ";
-  String info_command_message = temp + sizeof(fname) + " " + sizeof(lname) + " " + sizeof(dob);
-  Serial.println(template_command_message);
+  String info_command_message = temp + fname.length() + " " + lname.length() + " " + dob.length();
+  Serial.println(info_command_message);
   Serial.println(fname);
   Serial.println(lname);
   Serial.println(dob);
 
-  String template_message = String((char*)template_buffer);
+  String template_message = template_buffer;
+  //  String info_message = String((char*)template_buffer);
   temp  = "template ";
   String template_command_message = temp + sizeof(template_buffer) + " " + sizeof(template_buffer);
   Serial.println(template_command_message);
   Serial.print(template_message);
-  
+
   while (1) {
     if (Serial.available()) {
       String doneflag = Serial.readStringUntil('\n'); // Reading anything from PC
