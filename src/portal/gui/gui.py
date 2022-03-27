@@ -2,9 +2,7 @@ import time
 from pathlib import Path
 import copy
 import random
-
 from cv2 import cv2
-
 import tkinter
 from tkinter import Frame, Button, Label, PhotoImage, Tk, Canvas, Entry, StringVar
 
@@ -15,6 +13,9 @@ identitySubmitted = False
 
 
 def submitIdentity():
+    # TODO 
+    # Send your identity information to wearable
+    # Return success flag
     global identitySubmitted
     identitySubmitted = True
 
@@ -22,20 +23,22 @@ def submitIdentity():
 def waitForPassportData():
     # TODO
     # Send start
-    # Wait for data
+    # Wait for data to verify
+    # Return data
     time.sleep(1)
+    return None
 
 
 def waitForPassportConnection():
     # TODO
     # Send start
-    # Wait for data
+    # Wait for bluetooth connection to enroll
     time.sleep(1)
 
 
 def findFace(image):
     # TODO
-    # Detect face
+    # Detect face to verify
     global count
     count = count + 1
     if count == 20:
@@ -46,6 +49,7 @@ def findFace(image):
 
 def compareBiometrics():
     # TODO
+
     result = random.randint(0, 3)
     if result <= 1:
         return None
@@ -55,6 +59,9 @@ def compareBiometrics():
 
 def saveData(image, name, birthdate):
     # TODO
+    #Create Template from Image
+    #Combiine Template and data
+    #Send Serial
     result = random.randint(0, 3)
     if result <= 1:
         return None
@@ -62,7 +69,7 @@ def saveData(image, name, birthdate):
         return [name, birthdate]
 
 
-def home():
+def homescreen():
     frmMain = Frame(gui, bg="white")
     # Configure the row/col of our frame and root window to be resizable and fill all available space
     frmMain.grid(row=0, column=0, sticky="NESW")
@@ -101,7 +108,7 @@ def verify():
     homeButtonImage = PhotoImage(file=str(imagePath / "homeButton.png"))
 
     homeButton = Button(frmVerify, image=homeButtonImage, bg='white',
-                        command=lambda: home(), height=32, width=125, borderwidth=0)
+                        command=lambda: homescreen(), height=32, width=125, borderwidth=0)
     homeButton.image = homeButtonImage
     homeButton.place(anchor=tkinter.CENTER, relx=.075, rely=.055)
 
@@ -117,7 +124,7 @@ def verify():
 
     Tk.update(gui)
 
-    waitForPassportData()
+    PassportData = waitForPassportData()
 
     startOverImage = PhotoImage(file=str(imagePath / "startOverButton.png"))
     startOverButton = Button(frmVerify, image=startOverImage, bg='white',
@@ -229,7 +236,7 @@ def enroll():
     homeButtonImage = PhotoImage(file=str(imagePath / "homeButton.png"))
 
     homeButton = Button(frmEnroll, image=homeButtonImage, bg='white',
-                        command=lambda: home(), height=32, width=125, borderwidth=0)
+                        command=lambda: homescreen(), height=32, width=125, borderwidth=0)
     homeButton.image = homeButtonImage
     homeButton.place(anchor=tkinter.CENTER, relx=.075, rely=.055)
 
@@ -343,41 +350,23 @@ def enroll():
                   fg='white')
         w.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
 
-
-def input():
-    frmEnroll = Frame(gui, bg="white")
-    # Configure the row/col of our frame and root window to be resizable and fill all available space
-    frmEnroll.grid(row=0, column=0, sticky="NESW")
-    frmEnroll.grid_rowconfigure(0, weight=1)
-    frmEnroll.grid_columnconfigure(0, weight=1)
-
-    # create the text entry box for
-    # showing the expression .
-    identity = StringVar()
-    expression_field = Entry(frmEnroll, textvariable=identity)
-
-    # grid method is used for placing
-    # the widgets at respective positions
-    # in table like structure .
-    expression_field.grid(columnspan=4, ipadx=70)
-
-
 # Driver code
 if __name__ == "__main__":
-    # create a GUI window
+    # Create a GUI window
     gui = Tk()
 
-    # set the background colour of GUI window
+    # Set the background colour of GUI window
     gui.configure(background="white")
 
-    # set the title of GUI window and remove tkinter icon
+    # Set the title of GUI window and remove tkinter icon
     gui.title("Identity Verification System")
     gui.wm_attributes('-toolwindow', 'True')
 
-    # set the configuration of GUI window
+    # Set the configuration of GUI window
     gui.geometry("1000x700")
     gui.grid_rowconfigure(0, weight=1)
     gui.grid_columnconfigure(0, weight=1)
-    # start the GUI
-    home()
+
+    # Start the GUI on the homescreen
+    homescreen()
     gui.mainloop()
