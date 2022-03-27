@@ -17,9 +17,9 @@
 //  VCC              ->           PIN 8
 //  GND              ->           GND
 //  TXD              ->           PIN 3
-//                      2k ohm -> PIN 2
+//                      2k ohm -> GND
 //  RXD              -> | (3.3V)
-//                      1k ohm <- 5V
+//                      1k ohm <- PIN 2
 //  STATE            ->           OPEN
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,8 +93,6 @@ void setup() {
     }
   }
   //---------------------------------------------
-
-  debugMessage("Scan a MIFARE Classic card");
 }
 
 void loop() {
@@ -121,13 +119,16 @@ void loop() {
 //Scan NFC tag
 void NFC_Reading() {
 
+   debugMessage("Scan a MIFARE Classic card");
 
-  //   Look for new cards
-  if (!mfrc522.PICC_IsNewCardPresent()) {
-    return;
+  while(1){
+    //   Look for new cards
+    if (mfrc522.PICC_IsNewCardPresent()) {
+      break;
+    }
   }
 
-  // Select one of the cards
+   // Select one of the cards
   if (!mfrc522.PICC_ReadCardSerial()) {
     return;
   }
@@ -246,13 +247,6 @@ void BLE_Setup() {
 
     String address_set_message = "BT address set: ";
     debugMessage(address_set_message + bt_address_set);
-
-    //    configBt.println("AT+ROLE?");
-    //    delay(30);
-    //    configBt.println("AT+CMODE?");
-    //    delay(30);
-    //    configBt.println("AT+BIND?");
-    //    delay(30);
 
     retries += 1;
     match = role_ok && bt_mode && bt_address_set;
@@ -380,21 +374,6 @@ void receiveTemplate() {
   digitalWrite(PW_PIN, LOW); // power off
 }
 
-
-// int readUntil(char* buffer) {
-//     int readIdx = 0;
-//     char readChar;
-//
-//     while (1) {
-//         readChar = configBt.read();
-//         if (readChar == '\n') {
-//             return readIdx;
-//         }
-//
-//         buffer[readIdx] = readChar;
-//         readIdx++;
-//     }
-// }
 //Read specific block
 int readBlock(int blockNumber, byte arrayAddress[]) {
   int largestModulo4Number = blockNumber / 4 * 4;
