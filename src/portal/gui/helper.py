@@ -3,15 +3,31 @@ import time
 import random
 
 ## Internal Imports
+from src.portal.scanner.serial import parse_serial_command, SerialCommand
 from src.portal.scanner.scanner import init_scanner, get_template
 from src.portal.biometrics.face_detection import detect_faces, validate_faces_bbox
 from src.portal.biometrics.template import compare
+
+
 ## Verification
 
 # Get passport data to be verified
 def waitForPassportData():
     scanner_ser = init_scanner()
-    passportData = get_template(scanner_ser)
+    command = scanner_ser.readLine()
+    command, data = parse_serial_command(command, scanner_ser)
+
+    if command == SerialCommand.INFO:
+        firstName = data['fname']
+        lastName = data['lname']
+        dob = data['dob']
+
+    command = scanner_ser.readLine()
+    command, data = parse_serial_command(command, scanner_ser)
+    if command == SerialCommand.TEMPLATE:
+        template = data['template']
+    
+    passportData = [template,(firstName+" "+lastName),dob]
     return passportData
 
 
