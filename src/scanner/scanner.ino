@@ -113,7 +113,7 @@ void loop() {
     debugMessage("BLE is updated.");
     // communite with passport
     delay(10);
-    recieveTemplate();
+    receiveTemplate();
     Serial.flush();
   }
 }
@@ -310,7 +310,7 @@ bool parseBTResponse() {
 }
 
 //Recieve template file
-void recieveTemplate() {
+void receiveTemplate() {
 
   digitalWrite(EN_PIN, LOW); // enable pin low
   //digitalWrite(PW_PIN,LOW);// power off
@@ -320,49 +320,37 @@ void recieveTemplate() {
   delay(500);
 
   bool at_start = false;
-  bool at_end = false;
+
   byte template_buffer[128];
   int template_idx = 0;
   while (1) {
     if (configBt.available()) {
       byte character = configBt.read();
-//      Serial.print(character);
       if (character == '@') {
         at_start = true;
-        at_end = at_start && !at_end;
         continue;
       }
       if (at_start) {
-        template_buffer[template_idx] = character;
-        template_idx += 1;
-      }
+        String fname = configBt.readStringUntil('\n');
+        String lname = configBt.readStringUntil('\n');
+        String dob = configBt.readStringUntil('\n');
+        String template_buffer = configBt.readStringUntil('@');
 
-      if (at_end) {
         break;
       }
-      //response------------------------
-      
-      //-----------------------------------
     }
-    
-    //  else {
-    //   //stop-----------------------------
-    //   if (Serial.available()) {
-    //     String stopflag = Serial.readStringUntil('\n'); // Reading anything from PC
-    //     if (stopflag == "stop") {
-    //       stage_one = 0;
-    //       stage_two = 0;
-    //       stage_three = 0;
-    //       Serial.print("STAGE 3 TIME OUT");
-    //       break;
-    //     }
-    //   }
-    //   //---------------------------------
-    // }
   }
 
+  String info_message = String((char*)template_buffer);
+  String temp  = "info ";
+  String info_command_message = temp + sizeof(fname) + " " + sizeof(lname) + " " + sizeof(dob);
+  Serial.println(template_command_message);
+  Serial.println(fname);
+  Serial.println(lname);
+  Serial.println(dob);
+
   String template_message = String((char*)template_buffer);
-  String temp  = "template ";
+  temp  = "template ";
   String template_command_message = temp + sizeof(template_buffer) + " " + sizeof(template_buffer);
   Serial.println(template_command_message);
   Serial.print(template_message);
@@ -392,6 +380,21 @@ void recieveTemplate() {
   digitalWrite(PW_PIN, LOW); // power off
 }
 
+
+// int readUntil(char* buffer) {
+//     int readIdx = 0;
+//     char readChar;
+//
+//     while (1) {
+//         readChar = configBt.read();
+//         if (readChar == '\n') {
+//             return readIdx;
+//         }
+//
+//         buffer[readIdx] = readChar;
+//         readIdx++;
+//     }
+// }
 //Read specific block
 int readBlock(int blockNumber, byte arrayAddress[]) {
   int largestModulo4Number = blockNumber / 4 * 4;
