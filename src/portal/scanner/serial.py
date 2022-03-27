@@ -14,6 +14,7 @@ class SerialCommand(enum.Enum):
     STOP = enum.auto()
     PRINT = enum.auto()
     EMPTY = enum.auto()
+    INFO = enum.auto()
     UNKNOWN = enum.auto()
 
 
@@ -26,6 +27,14 @@ def read_template(ser: serial.Serial, read_bytes: int, template_len: int):
     template_bytes = ser.read(read_bytes)
 
     return template_bytes
+
+
+def read_info(ser: serial.Serial) -> Tuple[str, str, str]:
+    fname = ser.readline().decode("utf-8")
+    lname = ser.readline().decode("utf-8")
+    dob = ser.readline().decode("utf-8")
+
+    return fname, lname, dob
 
 
 def parse_serial_command(command: str, ser: serial.Serial) -> Tuple[SerialCommand, Union[Dict, None]]:
@@ -45,6 +54,17 @@ def parse_serial_command(command: str, ser: serial.Serial) -> Tuple[SerialComman
         template = read_template(ser, read_bytes, template_len)
 
         return SerialCommand.TEMPLATE, {"template": template}
+    elif command == 'info':
+        fname_len, lname_len, dob_len = int(command_args[0]), int(command_args[1]), int(command_args[1])
+        fname, lname, dob = read_info(ser)
+
+        if fname_len != len(fname) or lname_len != len(lname) or dob_len != len(dob):
+            print(f'mismatch length')
+            print(f'{fname_len=} {fname=}')
+            print(f'{lname_len=} {lname=}')
+            print(f'{dob_len=} {dob=}')
+
+        return SerialCommand.INFO, {"fname": fname, "lname": lname, "dob": dob}
     elif command == 'stop':
         print("stop command")
         return SerialCommand.STOP, None
