@@ -3,8 +3,7 @@ import time
 import random
 
 ## Internal Imports
-from src.portal.scanner.serial import parse_serial_command, SerialCommand
-from src.portal.scanner.scanner import init_scanner, get_template
+from src.portal.scanner import scanner
 from src.portal.biometrics.face_detection import detect_faces, validate_faces_bbox
 from src.portal.biometrics.template import compare
 
@@ -13,22 +12,18 @@ from src.portal.biometrics.template import compare
 
 # Get passport data to be verified
 def waitForPassportData():
-    scanner_ser = init_scanner()
-    command = scanner_ser.readLine()
-    command, data = parse_serial_command(command, scanner_ser)
+    scanner_ser = scanner.init_scanner()
 
-    if command == SerialCommand.INFO:
-        firstName = data['fname']
-        lastName = data['lname']
-        dob = data['dob']
+    command, data = scanner.next_input(scanner_ser)
+    assert (command == scanner.SerialCommand.INFO)
+    fname, lname, dob = data['fname'], data['lname'], data['dob']
 
-    command = scanner_ser.readLine()
-    command, data = parse_serial_command(command, scanner_ser)
-    if command == SerialCommand.TEMPLATE:
-        template = data['template']
+    command, data = scanner.next_input(scanner_ser)
+    assert (command == scanner.SerialCommand.TEMPLATE)
+    template = data['template']
+    passport_data = [template, (fname + " " + lname), dob]
 
-    passportData = [template, (firstName + " " + lastName), dob]
-    return passportData
+    return passport_data
 
 
 # Find face in image
