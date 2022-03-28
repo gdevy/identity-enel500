@@ -26,8 +26,8 @@ def waitForPassportData():
     command, data = parse_serial_command(command, scanner_ser)
     if command == SerialCommand.TEMPLATE:
         template = data['template']
-    
-    passportData = [template,(firstName+" "+lastName),dob]
+
+    passportData = [template, (firstName + " " + lastName), dob]
     return passportData
 
 
@@ -39,7 +39,7 @@ def findFace(image):
 
 
 # Verify template distance
-def compareBiometrics(passportData,probePath):
+def compareBiometrics(passportData, probePath):
     template = passportData[0]
     name = passportData[1]
     birthdate = passportData[2]
@@ -61,6 +61,7 @@ def waitForPassportConnection():
     # Wait for connection to enroll then return
     time.sleep(1)
 
+
 # Send identity data to wearable (ENROLLMENT)
 def submitIdentity():
     # TODO 
@@ -71,9 +72,9 @@ def submitIdentity():
 
 def saveData(image, name, birthdate):
     # TODO
-    #Create Template from Image
-    #Combiine Template and data
-    #Send Serial
+    # Create Template from Image
+    # Combiine Template and data
+    # Send Serial
     result = random.randint(0, 3)
     if result <= 1:
         return None

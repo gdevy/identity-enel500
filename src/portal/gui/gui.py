@@ -1,10 +1,9 @@
-
 from pathlib import Path
 import copy
 from cv2 import cv2
 import tkinter
 from tkinter import Frame, Button, Label, PhotoImage, Tk, Canvas, Entry, StringVar
-import helper
+from . import helper
 
 # Path for images used in GUI
 imagePath = (Path(__file__) / ".." / "Images").resolve()
@@ -15,10 +14,12 @@ count = 0
 # enrollment identity submission flag
 identitySubmitted = False
 
+
 # update flag value
 def submitFlag():
     global identitySubmitted
     identitySubmitted = True
+
 
 # Homescreen GUI Layout
 def homescreen():
@@ -45,6 +46,7 @@ def homescreen():
                           command=lambda: verify(), height=60, width=305, borderwidth=0)
     verifyButton.image = verifyButtonImage
     verifyButton.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
+
 
 # Verify Screens layout
 def verify():
@@ -108,7 +110,7 @@ def verify():
 
     # Compare user biometrics to passport data
     probePath = Path(".") / "temp.jpg"
-    result = helper.compareBiometrics(passportData,probePath)
+    result = helper.compareBiometrics(passportData, probePath)
 
     # Display results
     radius = 125
@@ -241,8 +243,8 @@ def enroll():
 
     # Save data to SD Card in wearable
     result = helper.saveData(frameImage, name.get(), birthDate.get())
-    
-    #Display results
+
+    # Display results
     if result is not None:
         radius = 125
         cameraCanvas.create_oval(450 - radius, 275 - radius, 450 + radius, 275 + radius, fill='green', outline='green')
@@ -251,16 +253,20 @@ def enroll():
         w = Label(frmEnroll, background='green', justify='center', font='Helvetica 20 bold', text='Success', fg='white')
         w.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
         cameraCanvas.create_rectangle(200, 425, 700, 525, fill="light grey", outline="light grey")
-        identity = Label(frmEnroll, background='light grey', justify='center', font='Helvetica 20 bold', text='Name: ' + result[0] + '\nDate of Birth: ' + result[1])
+        identity = Label(frmEnroll, background='light grey', justify='center', font='Helvetica 20 bold',
+                         text='Name: ' + result[0] + '\nDate of Birth: ' + result[1])
         identity.place(anchor=tkinter.CENTER, relx=.5, rely=.775)
 
     else:
         radius = 125
-        cameraCanvas.create_oval(450 - radius, 275 - radius, 450 + radius, 275 + radius, fill='dark red', outline='dark red')
+        cameraCanvas.create_oval(450 - radius, 275 - radius, 450 + radius, 275 + radius, fill='dark red',
+                                 outline='dark red')
         cameraCanvas.create_line(450 - 65, 275 - 70, 450 + 70, 275 + 45, capstyle=tkinter.ROUND, fill='white', width=8)
         cameraCanvas.create_line(450 - 65, 275 + 45, 450 + 70, 275 - 70, capstyle=tkinter.ROUND, fill='white', width=8)
-        w = Label(frmEnroll, background='dark red', justify='center', font='Helvetica 20 bold', text='Failed', fg='white')
+        w = Label(frmEnroll, background='dark red', justify='center', font='Helvetica 20 bold', text='Failed',
+                  fg='white')
         w.place(anchor=tkinter.CENTER, relx=.5, rely=.6)
+
 
 # Display camera frame and return face detected flag
 def show_frame(cap, cameraCanvas):
@@ -282,6 +288,7 @@ def show_frame(cap, cameraCanvas):
     cameraCanvas.create_image(100, 100, image=frameImage, anchor=tkinter.CENTER)
     Tk.update(gui)
     return helper.findFace(img)
+
 
 # Display camera frame in background
 def show_frame_background(cap, cameraCanvas):
