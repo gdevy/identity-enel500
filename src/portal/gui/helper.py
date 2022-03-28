@@ -56,15 +56,6 @@ def waitForPassportConnection():
     # Wait for connection to enroll then return
     time.sleep(1)
 
-
-# Send identity data to wearable (ENROLLMENT)
-def submitIdentity():
-    # TODO 
-    # Send your identity information to wearable
-    # Set success flag
-    return True
-
-
 def saveData(image, name, birthdate):
     # TODO
     # Create Template from Image

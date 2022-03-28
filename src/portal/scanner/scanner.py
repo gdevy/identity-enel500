@@ -51,7 +51,7 @@ def init_scanner(port_name: str = 'COM5', baud_rate: int = 9600) -> Union[None, 
 
     ser.write(str.encode("start\n"))
     ser.flush()
-    response = ser.readline()
+    response = ser.readline().decode('utf-8')
     print(f"Response to start: {response}")
 
     response = str(response).strip()
@@ -90,7 +90,6 @@ def read_debug_message(ser: serial.Serial, message_size: int) -> str:
 
 def read_template(ser: serial.Serial, read_bytes: int, template_len: int):
     template_bytes = ser.read(read_bytes)
-
     return template_bytes
 
 
@@ -111,7 +110,6 @@ def next_input(ser: serial.Serial) -> Tuple[SerialCommand, Union[Dict, None]]:
     while True:
         command_line = ser.readline().decode("utf-8")
         command, data = parse_serial_command(command_line, ser)
-
         if command == SerialCommand.PRINT:
             show_serial_debug(data['message'])
             continue
