@@ -2,21 +2,29 @@ from pathlib import Path
 import copy
 from cv2 import cv2
 import tkinter
-from tkinter import Frame, Button, Label, PhotoImage, Tk, Canvas, Entry, StringVar
+from tkinter import Frame, Button, Label, PhotoImage, Tk, Canvas, Entry, StringVar,messagebox
 from . import helper
+from datetime import datetime
 
 # Path for images used in GUI
 imagePath = (Path(__file__) / ".." / "Images").resolve()
-
-# TODO: Delete variables once GUI connected to biometric algorithm
-count = 0
 
 # enrollment identity submission flag
 identitySubmitted = False
 
 
 # update flag value
-def submitFlag():
+def submitFlag(name, dob):
+    if (name==None):
+        messagebox.showerror(title="Error on Name", message="Please enter name!")
+        return()
+    else:
+        try:
+            date = datetime.strptime(dob, "%d/%m/%Y")
+        except:
+            messagebox.showerror(title="Error on DOB", message="Please enter correct date of birth with the following format: dd/mm/yyyy!")
+            return()
+
     global identitySubmitted
     identitySubmitted = True
 
@@ -50,8 +58,6 @@ def homescreen():
 
 # Verify Screens layout
 def verify():
-    global count
-    count = 0
     frmVerify = Frame(gui, bg="white")
     frmVerify.grid(row=0, column=0, sticky="NESW")
     frmVerify.grid_rowconfigure(0, weight=1)
@@ -138,10 +144,6 @@ def verify():
 
 # Enrollement Screen layout
 def enroll():
-    # TODO: Remove once biometrics algorithm set up
-    global count
-    count = 0
-
     # Global flag used to display the camera in the background
     global identitySubmitted
     identitySubmitted = False
@@ -206,7 +208,7 @@ def enroll():
 
     submitButton = Button(frmEnroll, image=submitButtonImage, bg='light grey', background='light grey',
                           activebackground='light grey',
-                          command=lambda: helper.submitIdentity(), height=32, width=95, borderwidth=0)
+                          command=lambda: helper.submitIdentity(name.get(), birthDate.get()), height=32, width=95, borderwidth=0)
     submitButton.image = submitButtonImage
     submitButton.place(anchor=tkinter.CENTER, relx=.65, rely=.6)
 
