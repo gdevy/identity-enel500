@@ -51,11 +51,9 @@ def init_scanner(port_name: str = 'COM5', baud_rate: int = 9600) -> Union[None, 
 
     ser.write(str.encode("start\n"))
     ser.flush()
-    response = ser.readline().decode('utf-8')
-    print(f"Response to start: {response}")
 
-    response = str(response).strip()
-    if response != "ok":
+    command, data = next_input(ser)
+    if command != SerialCommand.STARTOK:
         raise ScannerInitError("Couldn't start communication with scanner")
 
     return ser
@@ -80,6 +78,7 @@ class SerialCommand(enum.Enum):
     PRINT = enum.auto()
     EMPTY = enum.auto()
     INFO = enum.auto()
+    STARTOK = enum.auto()
     UNKNOWN = enum.auto()
 
 
@@ -150,6 +149,8 @@ def parse_serial_command(command: str, ser: serial.Serial) -> Tuple[SerialComman
             print(f'{dob_len=} {dob=}')
 
         return SerialCommand.INFO, {"fname": fname, "lname": lname, "dob": dob}
+    elif command == 'ok':
+        return SerialCommand.STARTOK, None
     elif command == 'stop':
         print("stop command")
         return SerialCommand.STOP, None
