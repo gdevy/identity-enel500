@@ -86,6 +86,10 @@ def verify():
     # Wait for passport connection and data
     passportData = helper.waitForPassportData()
 
+    if passportData == None:
+        messagebox.showerror(title= 'Scanner Connection Error', message='Failed to connect to scanner!')
+        homescreen()
+
     # Get button images and setup GUI Buttons 
     startOverImage = PhotoImage(file=str(imagePath / "startOverButton.png"))
     startOverButton = Button(frmVerify, image=startOverImage, bg='white',

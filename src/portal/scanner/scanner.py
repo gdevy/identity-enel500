@@ -53,6 +53,7 @@ def init_scanner(port_name: str = 'COM5', baud_rate: int = 9600) -> Union[None, 
     ser.flush()
 
     command, data = next_input(ser)
+    print(command)
     if command != SerialCommand.STARTOK:
         raise ScannerInitError("Couldn't start communication with scanner")
 
@@ -108,6 +109,8 @@ def show_serial_debug(message: str):
 def next_input(ser: serial.Serial) -> Tuple[SerialCommand, Union[Dict, None]]:
     while True:
         command_line = ser.readline().decode("utf-8")
+        print("Got here!")
+        print(command_line)
         command, data = parse_serial_command(command_line, ser)
         if command == SerialCommand.PRINT:
             show_serial_debug(data['message'])
@@ -128,6 +131,7 @@ def parse_serial_command(command: str, ser: serial.Serial) -> Tuple[SerialComman
         print("Blank command")
         return SerialCommand.EMPTY, None
 
+    print(command,command_args)
     if command == 'print':
         read_bytes = int(command_args[0])
         print_lines = read_debug_message(ser, read_bytes)

@@ -65,7 +65,7 @@ void setup() {
   // Init MFRC522
   mfrc522.PCD_Init();
   delay(4);       // Optional delay. Some board do need more time after init to be ready, see Readme
-  mfrc522.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
+  // mfrc522.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
 
   pinMode(BT_TX, OUTPUT);
   pinMode(BT_RX, INPUT);

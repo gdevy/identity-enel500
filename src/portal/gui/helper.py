@@ -12,8 +12,11 @@ from src.portal.biometrics.template import compare
 
 # Get passport data to be verified
 def waitForPassportData():
-    scanner_ser = scanner.init_scanner()
-
+    try:
+        scanner_ser = scanner.init_scanner(port_name = 'COM3')
+    except Exception as e:
+        print(e)
+        return None
     command, data = scanner.next_input(scanner_ser)
     assert (command == scanner.SerialCommand.INFO)
     fname, lname, dob = data['fname'], data['lname'], data['dob']
