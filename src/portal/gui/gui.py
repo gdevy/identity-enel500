@@ -325,6 +325,9 @@ def show_frame_background(cap, cameraCanvas):
 
 # Driver code
 if __name__ == "__main__":
+    # Initialise scanner communication
+    helper.initialiseCommunication()
+
     # Create a GUI window
     gui = Tk()
 

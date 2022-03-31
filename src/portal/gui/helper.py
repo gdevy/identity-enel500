@@ -12,6 +12,10 @@ from src.portal.biometrics.template import compare
 scanner_ser = None
 
 
+def initialiseCommunication():
+    global scanner_ser
+    scanner_ser = scanner.init_scanner(port_name = 'COM3')
+
 # Get passport data to be verified
 def waitForPassportData():
     try:
