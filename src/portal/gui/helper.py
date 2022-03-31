@@ -9,11 +9,15 @@ from src.portal.biometrics.template import compare
 
 
 ## Verification
+scanner_ser = None
+
 
 # Get passport data to be verified
 def waitForPassportData():
     try:
-        scanner_ser = scanner.init_scanner(port_name = 'COM3')
+        global scanner_ser
+        if scanner_ser == None:
+            scanner_ser = scanner.init_scanner(port_name = 'COM3')
     except Exception as e:
         print(e)
         return None
