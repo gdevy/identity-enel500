@@ -89,6 +89,7 @@ def verify():
     if passportData == None:
         messagebox.showerror(title= 'Scanner Connection Error', message='Failed to connect to scanner!')
         homescreen()
+        return()
 
     # Get button images and setup GUI Buttons 
     startOverImage = PhotoImage(file=str(imagePath / "startOverButton.png"))
@@ -318,7 +319,6 @@ def show_frame_background(cap, cameraCanvas):
     Tk.update(gui)
     return img
 
-
 # Driver code
 if __name__ == "__main__":
     # Create a GUI window
@@ -329,7 +329,8 @@ if __name__ == "__main__":
 
     # Set the title of GUI window and remove tkinter icon
     gui.title("Identity Verification System")
-    gui.wm_attributes('-toolwindow', 'True')
+    iconImage = PhotoImage(file=str(imagePath / "logo.png"))
+    gui.iconphoto(False, iconImage)
 
     # Set the configuration of GUI window
     gui.geometry("1000x700")
