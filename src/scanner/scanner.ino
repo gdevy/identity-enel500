@@ -84,7 +84,7 @@ void setup() {
   //start check----------------------------------
   // Exit the loop until got "start" from PC
   while (1) {
-    if (Serial.available()) {
+    if (Serial.available()>= 6) {
       String startflag = Serial.readStringUntil('\n'); // Reading anything from PC
       if (startflag == "start") {
         Serial.println("ok");
@@ -92,7 +92,6 @@ void setup() {
       }
     }
   }
-  //---------------------------------------------
 }
 
 void loop() {

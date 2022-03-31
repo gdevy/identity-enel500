@@ -5,6 +5,7 @@ Communication with the scanner
 from pathlib import Path
 from typing import Union, Dict, List, Tuple
 import enum
+import time
 
 import serial
 import numpy as np
@@ -46,17 +47,12 @@ def init_scanner(port_name: str = 'COM5', baud_rate: int = 9600) -> Union[None, 
     :return:
     """
     ser = serial.Serial(port_name, baud_rate, timeout=10)
-
-    print(ser)
-
+    time.sleep(3)
     ser.write(str.encode("start\n"))
     ser.flush()
-
     command, data = next_input(ser)
-    print(command)
     if command != SerialCommand.STARTOK:
         raise ScannerInitError("Couldn't start communication with scanner")
-
     return ser
 
 
@@ -109,8 +105,6 @@ def show_serial_debug(message: str):
 def next_input(ser: serial.Serial) -> Tuple[SerialCommand, Union[Dict, None]]:
     while True:
         command_line = ser.readline().decode("utf-8")
-        print("Got here!")
-        print(command_line)
         command, data = parse_serial_command(command_line, ser)
         if command == SerialCommand.PRINT:
             show_serial_debug(data['message'])
@@ -128,7 +122,6 @@ def parse_serial_command(command: str, ser: serial.Serial) -> Tuple[SerialComman
     try:
         command, *command_args = command.split()
     except ValueError:
-        print("Blank command")
         return SerialCommand.EMPTY, None
 
     print(command,command_args)
