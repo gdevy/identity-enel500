@@ -84,7 +84,11 @@ def verify():
     Tk.update(gui)
 
     # Wait for passport connection and data
-    passportData = helper.waitForPassportData()
+    try:
+        passportData = helper.waitForPassportData()
+    except:
+        verify()
+        return()
 
     if passportData == None:
         messagebox.showerror(title= 'Scanner Connection Error', message='Failed to connect to scanner!')
