@@ -124,7 +124,7 @@ def verify():
     Tk.update(gui)
 
     # Compare user biometrics to passport data
-    probePath = Path(".") / "temp.jpg"
+    probePath = (Path(__file__)/ ".."/".."/".."/".."/ "temp.png").resolve()
     result = helper.compareBiometrics(passportData, probePath)
 
     # Display results
