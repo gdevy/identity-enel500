@@ -4,7 +4,7 @@ Functions handling creation of template
 
 from pathlib import Path
 from typing import List, Tuple
-
+from deepface import DeepFace
 from cv2 import cv2
 
 import numpy as np
@@ -34,7 +34,7 @@ def pipeline(image_path: Path) -> np.array:
 
 
 def compare(template: np.array, probe_path: Path, threshold=1.0) -> Tuple[float, bool]:
-
+    
     probe = pipeline(probe_path)
     dist = np.linalg.norm(template - probe)
 
