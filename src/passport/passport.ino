@@ -13,10 +13,14 @@
 //  VCC              ->           5V
 //  GND              ->           GND
 //  TXD              ->           D3
-//                      2k ohm -> D2
+//                      2k ohm -> GND
 //  RXD              -> | (3.3V)
-//                      1k ohm <- 5V
+//                      1k ohm <- D2
 //  STATE            ->           OPEN
+//
+//  Battery Check
+//  Pin A4           ->           Battery (+)  
+//  Pin 8            ->           LED Resistor       ->      LED
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <NeoSWSerial.h>
@@ -26,6 +30,8 @@
 #define BT_TX 2
 #define BT_RX 3
 #define SD_PIN 10
+#define Bat_PIN A4
+#define LED_PIN 8
 
 
 File Template;
@@ -40,7 +46,11 @@ void setup() {
   pinMode(BT_TX, OUTPUT); 
   pinMode(BT_RX, INPUT); 
   pinMode(SD_PIN, OUTPUT); // chip select pin must be set to OUTPUT mode
+  //pinMode(Bat_PIN,INPUT);
+  //pinMode(LED_PIN,OUTPUT);
 
+  //power_check();
+  
   if (!SD.begin(SD_PIN)) { // Initialize SD card
     debugMessage("Could not initialize SD card."); // if return value is false, something went wrong.
     return 1;
@@ -75,6 +85,15 @@ void loop() {
 
   delay(500); // wait for 500ms
 
+}
+
+void power_check(){
+  double vol = (analogRead(Bat_PIN)/1024.0)*5.0;
+  if(vol < 4.08){ //this is 3.8V 
+    digitalWrite(LED_PIN,HIGH); 
+    delay(1000);
+    digitalWrite(LED_PIN,LOW); 
+  }
 }
 
 void debugMessage(String message) {
