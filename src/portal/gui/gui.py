@@ -15,8 +15,8 @@ identitySubmitted = False
 
 # update flag value
 def submitFlag(name, dob):
-    if (name==None):
-        messagebox.showerror(title="Error on Name", message="Please enter name!")
+    if (name==None or len(name.split())!=2):
+        messagebox.showerror(title="Error on Name", message="Please enter fullname: FirstName LastName!")
         return()
     else:
         try:
@@ -111,9 +111,10 @@ def verify():
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     # Capture user image logic
-    captured = show_frame(cap, cameraCanvas)
-    while not captured:
+    captured = []
+    while (len(captured)==0):
         captured = show_frame(cap, cameraCanvas)
+
     frameImage = PhotoImage(file='temp.png')
     cap.release()
     cv2.destroyAllWindows()
@@ -217,7 +218,7 @@ def enroll():
 
     submitButton = Button(frmEnroll, image=submitButtonImage, bg='light grey', background='light grey',
                           activebackground='light grey',
-                          command=lambda: helper.submitIdentity(name.get(), birthDate.get()), height=32, width=95, borderwidth=0)
+                          command=lambda: submitFlag(name.get(), birthDate.get()), height=32, width=95, borderwidth=0)
     submitButton.image = submitButtonImage
     submitButton.place(anchor=tkinter.CENTER, relx=.65, rely=.6)
 
@@ -241,8 +242,9 @@ def enroll():
     w.place(anchor=tkinter.CENTER, relx=.5, rely=.06)
 
     # Capture user image logic
-    captured = show_frame(cap, cameraCanvas)
-    while not captured:
+    # Capture user image logic
+    captured = []
+    while (len(captured)==0):
         captured = show_frame(cap, cameraCanvas)
     frameImage = PhotoImage(file='temp.png')
     cap.release()
@@ -253,7 +255,8 @@ def enroll():
     Tk.update(gui)
 
     # Save data to SD Card in wearable
-    result = helper.saveData(frameImage, name.get(), birthDate.get())
+    probePath = (Path(__file__)/ ".."/".."/".."/".."/ "temp.png").resolve()
+    result = helper.saveData(probePath, name.get(), birthDate.get())
 
     # Display results
     if result is not None:
@@ -298,7 +301,9 @@ def show_frame(cap, cameraCanvas):
     frameImage = PhotoImage(file='temp.png')
     cameraCanvas.create_image(100, 100, image=frameImage, anchor=tkinter.CENTER)
     Tk.update(gui)
-    return helper.findFace(img)
+
+    probePath = (Path(__file__)/ ".."/".."/".."/".."/ "temp.png").resolve()
+    return helper.findFace(probePath)
 
 
 # Display camera frame in background
@@ -325,25 +330,28 @@ def show_frame_background(cap, cameraCanvas):
 
 # Driver code
 if __name__ == "__main__":
-    # Initialise scanner communication
-    helper.initialiseCommunication()
+    try: 
+        # Initialise scanner communication
+        helper.initialiseCommunication()
 
-    # Create a GUI window
-    gui = Tk()
+        # Create a GUI window
+        gui = Tk()
 
-    # Set the background colour of GUI window
-    gui.configure(background="white")
+        # Set the background colour of GUI window
+        gui.configure(background="white")
 
-    # Set the title of GUI window and remove tkinter icon
-    gui.title("Identity Verification System")
-    iconImage = PhotoImage(file=str(imagePath / "logo.png"))
-    gui.iconphoto(False, iconImage)
+        # Set the title of GUI window and remove tkinter icon
+        gui.title("Identity Verification System")
+        iconImage = PhotoImage(file=str(imagePath / "logo.png"))
+        gui.iconphoto(False, iconImage)
 
-    # Set the configuration of GUI window
-    gui.geometry("1000x700")
-    gui.grid_rowconfigure(0, weight=1)
-    gui.grid_columnconfigure(0, weight=1)
+        # Set the configuration of GUI window
+        gui.geometry("1000x700")
+        gui.grid_rowconfigure(0, weight=1)
+        gui.grid_columnconfigure(0, weight=1)
 
-    # Start the GUI on the homescreen
-    homescreen()
-    gui.mainloop()
+        # Start the GUI on the homescreen
+        homescreen()
+        gui.mainloop()
+    except RuntimeError as re:
+        print(re)
