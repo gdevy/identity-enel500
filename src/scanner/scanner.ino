@@ -34,6 +34,9 @@
 #define PW_PIN 8       //Bluetooth power pin
 #define BT_TX 2        //TX pin
 #define BT_RX 3        //RX pin
+#define TEMPLATE_SIZE 128 //Size of face template
+#define BTBAUDRATE 9600
+#define PORTALBAUDRATE 38400
 
 MFRC522 mfrc522(NFC_SS_PIN, NFC_RST_PIN);  // instatiate a MFRC522 reader object.
 MFRC522::MIFARE_Key key;          //create a MIFARE_Key struct named 'key', which will hold the card information
@@ -56,7 +59,7 @@ byte readbackblock[18];
 String test;
 
 void setup() {
-  Serial.begin(9600);   // Initialize serial communications with the PC
+  Serial.begin(PORTALBAUDRATE);   // Initialize serial communications with the PC
   while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
 
   // init SPI
@@ -100,14 +103,14 @@ void loop() {
 
   if (stage_one == 1) {
     // setting up BT connection (stage 2)
-    debugMessage("NFC tag was read.");
+    debugMessage("NFC tag was read.", true);
     BLE_Setup();
     Serial.flush();
   }
 
   if (stage_two == 1) {
     // Recieve template and send it (stage 3)
-    debugMessage("BLE is updated.");
+    debugMessage("BLE is updated.", true);
     // communite with passport
     delay(10);
     receiveTemplate();
@@ -118,7 +121,7 @@ void loop() {
 //Scan NFC tag
 void NFC_Reading() {
 
-  debugMessage("Scan a MIFARE Classic card");
+  debugMessage("Scan a MIFARE Classic card", true);
 
   while (1) {
     //   Look for new cards
@@ -132,7 +135,7 @@ void NFC_Reading() {
     return;
   }
 
-  debugMessage("NFC card detected");
+  debugMessage("NFC card detected", false);
 
   //read the block back
   readBlock(block, readbackblock);
@@ -146,7 +149,7 @@ void NFC_Reading() {
 
   String address((char*) readbackblock);
   String read_message = "read block: ";
-  debugMessage(read_message + address);
+  debugMessage(read_message + address, false);
   reselect_Card();
   //mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
 }
@@ -197,15 +200,13 @@ void BLE_Setup() {
 
 
   configBt.begin(38400);//setting rate for conmunicating BLE module
-  delay(2000);
+  delay(1000);
 
 
   configBt.println("AT");    //necessery to clear first-time error
   delay(30);
   configBt.println("AT");
-  delay(30);
   parseBTResponse();
-  delay(500);
   //------------------------
 
   int retries = 0;
@@ -213,7 +214,7 @@ void BLE_Setup() {
 
   while (!match) {//exit when got 3 "ok" which means Bluetooth module is setup
     String bt_loop_message = "BT setup loop: ";
-    debugMessage(bt_loop_message + retries);
+    debugMessage(bt_loop_message + retries, false);
     //Exit setup loop if it fails to setup for 3 times
     if (retries >= 3) {
       match = false; //Error mark
@@ -226,7 +227,7 @@ void BLE_Setup() {
     role_ok = parseBTResponse();
 
     String role_ok_message = "BT role set: ";
-    debugMessage(role_ok_message + role_ok);
+    debugMessage(role_ok_message + role_ok, false);
 
     //Set communication mode for Bluetooth module (0 for "connect to a fixed address"; 1 for "connect to any address")
     bool bt_mode = false;
@@ -234,7 +235,7 @@ void BLE_Setup() {
     bt_mode = parseBTResponse();
 
     String mode_ok_message = "BT role set: ";
-    debugMessage(mode_ok_message + bt_mode);
+    debugMessage(mode_ok_message + bt_mode, false);
 
     //Set the fixed address that Bluetooth module should connected to
     bool bt_address_set = false;
@@ -245,14 +246,14 @@ void BLE_Setup() {
     bt_address_set = parseBTResponse();
 
     String address_set_message = "BT address set: ";
-    debugMessage(address_set_message + bt_address_set);
+    debugMessage(address_set_message + bt_address_set, false);
 
     retries += 1;
     match = role_ok && bt_mode && bt_address_set;
   }
 
   String stage_2_end_message = "Stage 2 complete status: ";
-  debugMessage(stage_2_end_message + match);
+  debugMessage(stage_2_end_message + match, false);
 
   //Set mark to enter stage 3 if Bluetooth module is set up
   if (match) {
@@ -271,21 +272,25 @@ void BLE_Setup() {
   delay(100);
 }
 
-void debugMessage(String message) {
-  String command = "print ";
-  Serial.println(command + message.length());
-  Serial.println(message);
+void debugMessage(String message, bool printFlag) {
+  String command = "";
+  if (printFlag == true){
+    command = "print ";
+  } else {
+    command = "debug ";
+  }
+    Serial.println(command + message.length());
+    Serial.println(message);
 }
 
 bool parseBTResponse() {
-  delay(300);
-  if (configBt.available()) { //if the bluetooth module is sending something...
-    test = configBt.readString(); //print whatever the bluetooth module is sending
+  while (!configBt.available()) { //if the bluetooth module is sending something...
   }
+  test = configBt.readString();//print whatever the bluetooth module is sending
 
   //debug info
   String bt_response_message = "BT response: ";
-  debugMessage(bt_response_message + test);
+  debugMessage(bt_response_message + test, false);
 
   //change string to a byte array
   test.getBytes(btest, 3);
@@ -309,8 +314,7 @@ void receiveTemplate() {
   //digitalWrite(PW_PIN,LOW);// power off
   digitalWrite(PW_PIN, HIGH); // power on
 
-  configBt.begin(9600);
-  delay(500);
+  configBt.begin(BTBAUDRATE);
 
   bool at_start = false;
 
@@ -329,8 +333,6 @@ void receiveTemplate() {
   fname = configBt.readStringUntil('\n');
   lname = configBt.readStringUntil('\n');
   dob = configBt.readStringUntil('\n');
-  template_buffer = configBt.readStringUntil('@');
-  String info_message = template_buffer;
 
   String temp  = "info ";
   String info_command_message = temp + fname.length() + " " + lname.length() + " " + dob.length();
@@ -339,12 +341,19 @@ void receiveTemplate() {
   Serial.println(lname);
   Serial.println(dob);
 
+ 
+
   String template_message = template_buffer;
-  //  String info_message = String((char*)template_buffer);
+  
   temp  = "template ";
-  String template_command_message = temp + sizeof(template_buffer) + " " + sizeof(template_buffer);
+  String template_command_message = temp + " " + TEMPLATE_SIZE;
   Serial.println(template_command_message);
-  Serial.print(template_message);
+  for (int i = 0; i < TEMPLATE_SIZE-1; i++) {
+     template_buffer = configBt.readStringUntil(' ');
+     Serial.print(template_buffer+' ');
+  }
+ template_buffer = configBt.readStringUntil('@');
+ Serial.print(template_buffer+' ');
 
   while (1) {
     if (Serial.available()) {
@@ -353,16 +362,14 @@ void receiveTemplate() {
         stage_one = 0;
         stage_two = 0;
         stage_three = 0;
-        Serial.println("");
-        Serial.print("STAGE 3 Done");
+        debugMessage("Auth complete. Ready to scan", true);
         break;
       }
       else {
         stage_one = 0;
         stage_two = 0;
         stage_three = 0;
-        Serial.println("");
-        Serial.print("Unexpected error");
+        debugMessage("Unexpected error", true);
         break;
       }
     }

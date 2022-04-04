@@ -184,7 +184,12 @@ def enroll():
     Tk.update(gui)
 
     # Wait for SD Card to be ready
-    helper.waitForPassportConnection()
+    try:
+        helper.waitForPassportConnection()
+    except Exception as e:
+        messagebox.showerror(title="Error", message=str(e))
+        homescreen()
+        return
 
     # Get button images and setup buttons
     startOverImage = PhotoImage(file=str(imagePath / "startOverButton.png"))
@@ -192,6 +197,7 @@ def enroll():
                              command=lambda: enroll(), height=45, width=65, borderwidth=0)
     startOverButton.image = startOverImage
     startOverButton.place(anchor=tkinter.CENTER, relx=.95, rely=.05)
+    w.destroy()
     w = Label(frmEnroll, background='white', justify='center', font='Helvetica 15 bold',
               text='Complete identity information below.')
     w.place(anchor=tkinter.CENTER, relx=.5, rely=.06)
@@ -346,7 +352,7 @@ if __name__ == "__main__":
         gui.iconphoto(False, iconImage)
 
         # Set the configuration of GUI window
-        gui.geometry("1000x700")
+        gui.geometry("1000x690")
         gui.grid_rowconfigure(0, weight=1)
         gui.grid_columnconfigure(0, weight=1)
 

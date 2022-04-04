@@ -3,16 +3,19 @@ Communication with the scanner
 """
 
 from pathlib import Path
+from re import S
 from typing import Union, Dict, List, Tuple
 import enum
 import time
 
 import serial
+from tqdm import tqdm
 import numpy as np
 
 from src.portal.biometrics.camera import create_probe
 from src.portal.biometrics.template import compare
 
+PRINTDEBUG = False
 
 class ScannerInitError(Exception):
     pass
@@ -64,15 +67,14 @@ def send_result(ser: serial.Serial, auth_result: bool):
     :param ser: serial communication port
     :param auth_result: result of authentication
     """
-    response = "auth yes" if auth_result else "auth no"
-
-    ser.write(f'{response}\n')
+    ser.write(str.encode(f'auth {"yes" if auth_result else "no"}\n'))
 
 
 class SerialCommand(enum.Enum):
     TEMPLATE = enum.auto()
     STOP = enum.auto()
     PRINT = enum.auto()
+    DEBUG = enum.auto()
     EMPTY = enum.auto()
     INFO = enum.auto()
     STARTOK = enum.auto()
@@ -83,16 +85,31 @@ def read_debug_message(ser: serial.Serial, message_size: int) -> str:
     print_message = ser.read(message_size).decode("utf-8")
     return print_message
 
+def read_until(ser: serial.Serial, delim=" "):
+    s = ""
+    while True:
+        byte_read = ser.read().decode("utf-8")
+        if byte_read == delim:
+            return s
+        s = s + byte_read
 
-def read_template(ser: serial.Serial, read_bytes: int, template_len: int):
-    template_bytes = ser.read(read_bytes)
-    return template_bytes
+def read_template(ser: serial.Serial, template_len: int) -> List[float]:
+    template = [None] * template_len
+    for i in tqdm(range(template_len)):
+        try:
+            template_float = read_until(ser,' ')
+            template[i] = float(template_float)
+        except TypeError:
+            print("not a float")
+        except Exception as e:
+            print(e)
+    return template
 
 
 def read_info(ser: serial.Serial) -> Tuple[str, str, str]:
-    fname = ser.readline().decode("utf-8")
-    lname = ser.readline().decode("utf-8")
-    dob = ser.readline().decode("utf-8")
+    fname = ser.readline().decode("utf-8").rstrip()
+    lname = ser.readline().decode("utf-8").rstrip()
+    dob = ser.readline().decode("utf-8").rstrip()
 
     return fname, lname, dob
 
@@ -109,10 +126,12 @@ def next_input(ser: serial.Serial) -> Tuple[SerialCommand, Union[Dict, None]]:
         if command == SerialCommand.PRINT:
             show_serial_debug(data['message'])
             continue
+        if command == SerialCommand.DEBUG and PRINTDEBUG:
+            show_serial_debug(data['message'])
+            continue
 
         if command == SerialCommand.EMPTY:
             continue
-
         break
 
     return command, data
@@ -124,15 +143,14 @@ def parse_serial_command(command: str, ser: serial.Serial) -> Tuple[SerialComman
     except ValueError:
         return SerialCommand.EMPTY, None
 
-    print(command,command_args)
-    if command == 'print':
+    if command == 'print' or command == 'debug':
         read_bytes = int(command_args[0])
         print_lines = read_debug_message(ser, read_bytes)
 
-        return SerialCommand.PRINT, {"message": print_lines}
+        return SerialCommand.PRINT if command == "print" else SerialCommand.DEBUG, {"message": print_lines}
     elif command == 'template':
-        read_bytes, template_len = int(command_args[0]), int(command_args[1])
-        template = read_template(ser, read_bytes, template_len)
+        template_len = int(command_args[0])
+        template = read_template(ser, template_len)
 
         return SerialCommand.TEMPLATE, {"template": template}
     elif command == 'info':

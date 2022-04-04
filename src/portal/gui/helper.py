@@ -13,11 +13,11 @@ from src.portal.biometrics.template import compare, create_template, pipeline
 
 ## Verification
 scanner_ser = None
-
+baud_rate = 38400
 
 def initialiseCommunication():
-    global scanner_ser
-    scanner_ser = scanner.init_scanner(port_name = 'COM3')
+    global scanner_ser,baud_rate
+    scanner_ser = scanner.init_scanner(port_name = 'COM3',baud_rate = baud_rate)
 
 # Get passport data to be verified
 def waitForPassportData():
@@ -31,10 +31,11 @@ def waitForPassportData():
     command, data = scanner.next_input(scanner_ser)
     assert (command == scanner.SerialCommand.INFO)
     fname, lname, dob = data['fname'], data['lname'], data['dob']
-
+    print("First name: "+ fname)
     command, data = scanner.next_input(scanner_ser)
     assert (command == scanner.SerialCommand.TEMPLATE)
     template = data['template']
+
     passport_data = [template, (fname + " " + lname), dob]
 
     return passport_data
@@ -48,16 +49,14 @@ def findFace(imagePath):
 # Verify template distance
 def compareBiometrics(passportData, probePath):
     template = passportData[0]
-    print("template as folows")
-    print(template)
-
-    print ("passport data as follows")
-    print(passportData)
     name = passportData[1]
     birthdate = passportData[2]
     dist, auth = compare(template, probePath)
     print(f"Result of auth: {auth}")
-
+    
+    global scanner_ser
+    scanner.send_result(scanner_ser, auth)
+    
     if not auth:
         return None
     else:
@@ -68,8 +67,7 @@ def compareBiometrics(passportData, probePath):
 drivePath = None
 # Wait for wearable connection to began enrollment
 def waitForPassportConnection():
-    timeout = 5
-
+    timeout = 20
     timeout_start = time.time()
     global drivePath
     while (drivePath == None) and (time.time() < timeout_start + timeout):
@@ -98,9 +96,11 @@ def waitForPassportConnection():
 def saveData(image, name, birthdate):
     template = pipeline(image)
     if len(template)>0:
+        template = str(template).replace("[","").replace("]","").replace("\n","").strip().replace("  "," ")
         try:
             global drivePath
-            filepath = (Path(drivePath) / "/TEMPLATE.txt").resolve()
+            filepath = (Path(drivePath) / "TEMPLATE.txt").resolve()
+            drivePath = None
             with open(filepath, 'w') as f:
                 splitName = name.split()
                 f.write(splitName[0]+"\n")
@@ -110,7 +110,6 @@ def saveData(image, name, birthdate):
         except FileNotFoundError:
             print("Failed to write to file")
             return None
-
         return [name, birthdate]
     else:
         print("Failed to create template!")
