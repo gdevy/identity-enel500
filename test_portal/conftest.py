@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 from time import sleep
 import pty
 import pytest
@@ -60,3 +61,8 @@ def portal_serial(portal_side_port, ):
 
     s.read_all()
     s.close()
+
+
+@pytest.fixture
+def sample_images():
+    return (Path("") / "imgs").resolve()

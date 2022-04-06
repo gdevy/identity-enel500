@@ -34,12 +34,13 @@ def validate_faces_bbox(faces: List) -> Tuple[bool, str]:
     return True, ""
 
 
-def detect_faces(img) -> List:
+def detect_faces(img, *, min_width=200, min_height=200) -> List:
     """
     Apply face detection algorithm
     :param img: image as an array
     :return: list of face bounding boxes
     """
+
     if not hasattr(detect_faces, 'model'):
         model_path = Path("haar_model.xml")
         download_model(model_path)
@@ -49,7 +50,12 @@ def detect_faces(img) -> List:
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Detect faces
-    faces = detect_faces.model.detectMultiScale(gray, 1.1, 4)
+    detected_bboxes = detect_faces.model.detectMultiScale(gray, 1.1, 4)
+    faces = []
+    for bbox in detected_bboxes:
+        _, _, w, h = bbox
+        if w > min_width and h > min_height:
+            faces.append(bbox)
 
     return faces
 
@@ -63,3 +69,12 @@ def crop_face(face_bbox, img):
     """
     x, y, h, w = face_bbox
     return img[x:x + w, y:y + h, :]
+
+
+def label_faces(face_bbox, img, min_size: Tuple = (200, 200)):
+    min_h, min_w = min_size
+    x, y, w, h = face_bbox
+    if h > min_h and w > min_w:
+        img = cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
+    return img

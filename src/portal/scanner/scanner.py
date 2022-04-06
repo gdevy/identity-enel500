@@ -8,6 +8,7 @@ import time
 
 import serial
 from tqdm import tqdm
+
 PRINTDEBUG = False
 
 
@@ -25,11 +26,14 @@ def init_scanner(port_name: str = 'COM5', baud_rate: int = 9600) -> Union[None, 
     ser = serial.Serial(port_name, baud_rate, timeout=10)
     time.sleep(3)
     ser.write(str.encode("start\n"))
+    for _ in range(3):
+        command, data = next_input(ser, return_empty=True)
+        if command == SerialCommand.STARTOK:
+            return ser
 
-    command, data = next_input(ser, return_empty=True)
-    if command != SerialCommand.STARTOK:
-        raise ScannerInitError(f"Couldn't start communication with scanner. Expected ok but got {command}")
-    return ser
+        print(f"Trying to initiate communication with scanner. Expected ok but got {command}. Retrying")
+
+    raise ScannerInitError(f"Couldn't start communication with scanner.")
 
 
 def send_result(ser: serial.Serial, auth_result: bool):
