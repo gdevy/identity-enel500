@@ -1,10 +1,14 @@
+# External Import
 from pathlib import Path
 import copy
 from cv2 import cv2
 import tkinter
+import os
 from tkinter import Frame, Button, Label, PhotoImage, Tk, Canvas, Entry, StringVar,messagebox
-from . import helper
 from datetime import datetime
+
+# Internal Import
+from . import helper
 
 # Path for images used in GUI
 imagePath = (Path(__file__) / ".." / "Images").resolve()
@@ -31,6 +35,10 @@ def submitFlag(name, dob):
 
 # Homescreen GUI Layout
 def homescreen():
+    userImagePath = str((Path(__file__)/ ".."/".."/".."/".."/ "temp.png").resolve())
+    if os.path.exists(userImagePath):
+        os.remove(userImagePath)
+
     frmMain = Frame(gui, bg="white")
     frmMain.grid(row=0, column=0, sticky="NESW")
     frmMain.grid_rowconfigure(0, weight=1)
@@ -120,7 +128,7 @@ def verify():
     cv2.destroyAllWindows()
 
     # Show captured image to user
-    cameraCanvas.create_image(100, 100, image=frameImage, anchor=tkinter.CENTER)
+    cameraCanvas.create_image(0, 0, image=frameImage, anchor=tkinter.NW)
     cameraCanvas.Image = frameImage
     Tk.update(gui)
 
@@ -256,7 +264,7 @@ def enroll():
     cap.release()
     cv2.destroyAllWindows()
 
-    cameraCanvas.create_image(100, 100, image=frameImage, anchor=tkinter.CENTER)
+    cameraCanvas.create_image(0, 0, image=frameImage, anchor=tkinter.NW)
     cameraCanvas.Image = frameImage
     Tk.update(gui)
 
@@ -295,9 +303,8 @@ def show_frame(cap, cameraCanvas):
     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
     img = copy.deepcopy(cv2image)
 
-    scale_percent = 125  # percent of original size
-    width = int(frame.shape[1] * scale_percent / 100)
-    height = int(frame.shape[0] * scale_percent / 100)
+    width = int(frame.shape[1] * 70 / 100)
+    height = int(frame.shape[0] * 80 / 100)
     dim = (width, height)
 
     # resize image
@@ -305,7 +312,7 @@ def show_frame(cap, cameraCanvas):
     cv2.imwrite("temp.png", resized)
 
     frameImage = PhotoImage(file='temp.png')
-    cameraCanvas.create_image(100, 100, image=frameImage, anchor=tkinter.CENTER)
+    cameraCanvas.create_image(0, 0, image=frameImage, anchor=tkinter.NW)
     Tk.update(gui)
 
     probePath = (Path(__file__)/ ".."/".."/".."/".."/ "temp.png").resolve()
@@ -319,9 +326,8 @@ def show_frame_background(cap, cameraCanvas):
     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
     img = copy.deepcopy(cv2image)
 
-    scale_percent = 125  # percent of original size
-    width = int(frame.shape[1] * scale_percent / 100)
-    height = int(frame.shape[0] * scale_percent / 100)
+    width = int(frame.shape[1] * 70 / 100)
+    height = int(frame.shape[0] * 80 / 100)
     dim = (width, height)
 
     # resize image
@@ -329,7 +335,7 @@ def show_frame_background(cap, cameraCanvas):
     cv2.imwrite("temp.png", resized)
 
     frameImage = PhotoImage(file='temp.png')
-    cameraCanvas.create_image(100, 100, image=frameImage, anchor=tkinter.CENTER)
+    cameraCanvas.create_image(0, 0, image=frameImage, anchor=tkinter.NW)
     cameraCanvas.create_rectangle(250, 250, 650, 375, fill="light grey", outline="light grey")
     Tk.update(gui)
     return img
