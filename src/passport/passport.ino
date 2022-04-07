@@ -49,9 +49,7 @@ void setup() {
   pinMode(SD_PIN, OUTPUT); // chip select pin must be set to OUTPUT mode
   //pinMode(Bat_PIN,INPUT);   // pc1
   //pinMode(LED_PIN,OUTPUT);  // pc2
-  //pinMode(EN_PIN,OUTPUT);   // hc1
 
-  //hc05_setup();  //uncomment hc1 and this function when hc-05 is used
   //power_check(); //uncomment pc1, pc2 and this function to warn user when battery is low
   
   if (!SD.begin(SD_PIN)) { // Initialize SD card

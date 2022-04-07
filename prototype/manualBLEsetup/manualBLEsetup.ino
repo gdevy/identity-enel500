@@ -8,6 +8,16 @@
 //                                1k ohm <- D2
 //  STATE            ->           OPEN
 
+//
+// For testing, the serial monitor should be set to "Both NL & CR" and "9600 baud"
+// The Bluetooth module should be flashing with about 1s period
+// If not, disconnect 5V pin with usb cable connected and then connect 5V pin again 
+// For Master Module: Input "AT" then "AT+ROLE=1" then "AT+CMODE=0"
+// For Slave  Module: Input "AT" then "AT+ROLE=0" then "AT+CMODE=1"
+// To find the address: Input "AT+ADDR?"
+// For more AT commands, please refer to HC-05 AT Command Set: https://s3-sa-east-1.amazonaws.com/robocore-lojavirtual/709/HC-05_ATCommandSet.pdf
+// Or google "HC-05 AT Command"
+
 #include <NeoSWSerial.h>
 
 #define EN_PIN 5  //Bluetooth enable pin
@@ -21,20 +31,20 @@ void setup() {
   configBt.begin(38400);
   pinMode(BT_TX, OUTPUT);
   pinMode(BT_RX, INPUT);
+  pinMode(EN_PIN,OUTPUT);
+  delay(100);
   digitalWrite(EN_PIN,HIGH);// enable pin high
+  
 }
 
-void loop() {
-  
-  if(configBt.available()) //if the bluetooth module is sending something...
+void loop() 
+{
+  if(configBt.available()) // if the HC05 is sending something… 
   {
-    Serial.print(configBt.readString()); //print whatever the bluetooth module is sending 
+    Serial.print(configBt.readString()); // print in serial monitor
   }
-
-  if(Serial.available()) //if we have typed anything into the serial monitor input text box...
+  if(Serial.available()) // if serial monitor is outputting something… 
   {
-    Serial.print(Serial.peek());
-    configBt.write(Serial.read()); //write whatever we typed into the serial monitor input text box to the bluetooth module
+    configBt.write(Serial.read()); // write to Arduino’s Tx pin
   }
-
 }
